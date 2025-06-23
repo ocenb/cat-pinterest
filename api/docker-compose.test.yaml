@@ -1,0 +1,9 @@
+version: '3.9'
+services:
+  cat-pinterest-api-pg-test:
+    container_name: cat-pinterest-api-pg-test
+    image: postgres:17-alpine
+    env_file:
+      - .env.test
+    ports:
+      - '5433:5432'

@@ -1,0 +1,10 @@
+*
+
+!/src/
+!/openapi.yaml
+!/package.json
+!/package-lock.json
+!/tsconfig.json
+!/tsconfig.build.json
+
+**/*spec.ts

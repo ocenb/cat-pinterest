@@ -1,0 +1,57 @@
+version: "3.9"
+services:
+  proxy:
+    container_name: cat-pinterest-proxy
+    image: nginx:1.28-alpine-slim
+    volumes:
+      - type: bind
+        source: ./nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+    depends_on:
+      cat-pinterest-api:
+        condition: service_started
+    ports:
+      - "8080:80"
+    networks:
+      - cat-pinterest-net
+
+  cat-pinterest-api:
+    container_name: cat-pinterest-api
+    build: ./api/
+    networks:
+      - cat-pinterest-net
+    env_file:
+      - api/.env
+    depends_on:
+      cat-pinterest-api-pg:
+        condition: service_healthy
+
+  cat-pinterest-front:
+    container_name: cat-pinterest-front
+    build: ./front/
+    networks:
+      - cat-pinterest-net
+    environment:
+      - NODE_ENV=prod
+
+  cat-pinterest-api-pg:
+    container_name: cat-pinterest-api-pg
+    image: postgres:17-alpine
+    env_file:
+      - api/.env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - cat-pinterest-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
+
+networks:
+  cat-pinterest-net:
